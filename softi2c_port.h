@@ -30,7 +30,17 @@ typedef struct {
 #define SOFTWAREI2C_PORT_GET_SDA(config) (0) // TODO Implement
 #define SOFTWAREI2C_PORT_GET_SCL(config) (0) // TODO Implement
 
-#define SOFTWAREI2C_PORT_DELAY(config) {volatile int i; for(i = 0; i < 10; i++) { (void)i; }} // TODO Implement
+#define SOFTWAREI2C_PORT_DELAY(config) \
+{\
+    volatile int SoftI2C_Port_DelayCount; \
+    for(SoftI2C_Port_DelayCount = 0; \
+        SoftI2C_Port_DelayCount < 10; \
+        SoftI2C_Port_DelayCount++) \
+    { \
+        (void)SoftI2C_Port_DelayCount; \
+    } \
+} // TODO better implementation
+
 #define SOFTWAREI2C_PORT_ERROR(config, msg) {} // TODO Implement
 
 #endif // SOFTI2C_PORT_H_

@@ -44,7 +44,7 @@ bool SoftI2C_SendByte(SoftI2C_Port_Config_t config, uint8_t data);
 /**
 * Receive a byte using a given software I2C configuration
 */
-uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool sendAck);
+uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont);
 
 /**
 * Stop a data transfer using a given software I2C configuration

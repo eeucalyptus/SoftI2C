@@ -19,46 +19,61 @@
 
 inline void SoftI2C_SendBit(SoftI2C_Port_Config_t config, bool bit) {
     if(bit) {
-        SOFTWAREI2C_PORT_SET_SDA(config);
+        // SDA high if bit is true
+        SOFTWAREI2C_PORT_SDA_HIGH(config);
     }
     else {
-        SOFTWAREI2C_PORT_CLEAR_SDA(config);
+        // SDA low if bit is false
+        SOFTWAREI2C_PORT_SDA_LOW(config);
     }
-    I2SOFTWAREI2C_PORT_DELAY(config);
-    SOFTWAREI2C_PORT_SET_SCL(config);
+    // Delay
+    SOFTWAREI2C_PORT_DELAY(config);
+    // Clock high
+    SOFTWAREI2C_PORT_SCL_HIGH(config);
     do {
+        // Delay
         I2SOFTWAREI2C_PORT_DELAY(config);
     }
-    Until clock is actually high (clock stretching)
-    while(!SOFTWAREI2C_PORT_GET_SCL(config));
-    SOFTWAREI2C_PORT_CLEAR_SCL(config);
+    // TODO last delay may be needed (clock might have risen nanoseconds before check)
+
+    // Until clock is actually high (clock stretching)
+    while(!SOFTWAREI2C_PORT_SCL_GET(config));
+    // Clock low
+    SOFTWAREI2C_PORT_SCL_LOW(config);
 }
 
 inline bool SoftI2C_RecvBit(SoftI2C_Port_Config_t config) {
-    SOFTWAREI2C_PORT_SET_SDA(config);
-    I2SOFTWAREI2C_PORT_DELAY(config);
-    SOFTWAREI2C_PORT_SET_SCL(config);
+    // SDA High
+    SOFTWAREI2C_PORT_SDA_HIGH(config);
+    // Delay
+    SOFTWAREI2C_PORT_DELAY(config);
+    // Clock high
+    SOFTWAREI2C_PORT_SCL_HIGH(config);
     do {
-        I2SOFTWAREI2C_PORT_DELAY(config);
+        // Delay
+        SOFTWAREI2C_PORT_DELAY(config);
     }
-    while(!SOFTWAREI2C_PORT_GET_SCL(config));
-    Clock low
-    SOFTWAREI2C_PORT_CLEAR_SCL(config);
+    // Until clock is actually high (clock stretching)
+    while(!SOFTWAREI2C_PORT_SCL_GET(config));
+    // TODO last delay may be needed (clock might have risen nanoseconds before check)
+
+    // Clock low
+    SOFTWAREI2C_PORT_SCL_LOW(config);
 }
 
 void SoftI2C_Init(SoftI2C_Port_Config_t config) {
-    SOFT_I2SOFTWAREI2C_PORT_INIT_SDA(config);
-    SOFT_I2SOFTWAREI2C_PORT_INIT_SCL(config);
+    SOFTWAREI2C_PORT_SDA_INIT(config);
+    SOFTWAREI2C_PORT_SCL_INIT(config);
 }
 
 bool SoftI2C_Start(SoftI2C_Port_Config_t config, uint8_t address, bool reading) {
-    if(!SOFTWAREI2C_PORT_GET_SCL(config) || !SOFTWAREI2C_PORT_GET_SCL(config)) {
+    if(!SOFTWAREI2C_PORT_SCL_GET(config) || !SOFTWAREI2C_PORT_SCL_GET(config)) {
         SOFTWAREI2C_PORT_ERROR(config, "SDA or SCL already low!");
     }
 
-    SOFTWAREI2C_PORT_CLEAR_SDA(config);
+    SOFTWAREI2C_PORT_SDA_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);
-    SOFTWAREI2C_PORT_CLEAR_SCL(config);
+    SOFTWAREI2C_PORT_SCL_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);
 
     for(int i = 0; i < 7; i++)
@@ -73,9 +88,9 @@ bool SoftI2C_Start(SoftI2C_Port_Config_t config, uint8_t address, bool reading) 
 }
 
 bool SoftI2C_Restart(SoftI2C_Port_Config_t config, uint8_t address, bool reading) {
-    SOFTWAREI2C_PORT_SET_SDA(config);
+    SOFTWAREI2C_PORT_SDA_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
-    SOFTWAREI2C_PORT_SET_SCL(config);
+    SOFTWAREI2C_PORT_SCL_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
 
     return SoftI2C_Start(config, address, reading);
@@ -110,10 +125,10 @@ uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont) {
 
 
 void SoftI2C_Stop(SoftI2C_Port_Config_t config) {
-    SOFTWAREI2C_PORT_CLEAR_SDA(config);
+    SOFTWAREI2C_PORT_SDA_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);
-    SOFTWAREI2C_PORT_SET_SCL(config);
+    SOFTWAREI2C_PORT_SCL_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
-    SOFTWAREI2C_PORT_SET_SDA(config);
+    SOFTWAREI2C_PORT_SDA_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
 }

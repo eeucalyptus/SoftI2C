@@ -21,14 +21,14 @@ typedef struct {
     // TODO Implement
 } SoftI2C_Port_Config_t;
 
-#define SOFTWAREI2C_PORT_INIT_SDA(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_INIT_SCL(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SET_SDA(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SET_SCL(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_CLEAR_SDA(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_CLEAR_SCL(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_GET_SDA(config) (0) // TODO Implement
-#define SOFTWAREI2C_PORT_GET_SCL(config) (0) // TODO Implement
+#define SOFTWAREI2C_PORT_SDA_INIT(config) {(void)config;} // TODO Implement
+#define SOFTWAREI2C_PORT_SCL_INIT(config) {(void)config;} // TODO Implement
+#define SOFTWAREI2C_PORT_SDA_HIGH(config) {(void)config;} // TODO Implement
+#define SOFTWAREI2C_PORT_SCL_HIGH(config) {(void)config;} // TODO Implement
+#define SOFTWAREI2C_PORT_SDA_LOW(config) {(void)config;} // TODO Implement
+#define SOFTWAREI2C_PORT_SCL_LOW(config) {(void)config;} // TODO Implement
+#define SOFTWAREI2C_PORT_SDA_GET(config) (0) // TODO Implement
+#define SOFTWAREI2C_PORT_SCL_GET(config) (0) // TODO Implement
 
 #define SOFTWAREI2C_PORT_DELAY(config) \
 {\

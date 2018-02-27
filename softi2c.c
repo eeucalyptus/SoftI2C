@@ -62,55 +62,69 @@ inline bool SoftI2C_RecvBit(SoftI2C_Port_Config_t config) {
 }
 
 void SoftI2C_Init(SoftI2C_Port_Config_t config) {
+    // Initialize SDA pin
     SOFTWAREI2C_PORT_SDA_INIT(config);
+    // Initialize SCL pin
     SOFTWAREI2C_PORT_SCL_INIT(config);
 }
 
 bool SoftI2C_Start(SoftI2C_Port_Config_t config, uint8_t address, bool reading) {
+    // Check if already started or bus not ready
     if(!SOFTWAREI2C_PORT_SCL_GET(config) || !SOFTWAREI2C_PORT_SCL_GET(config)) {
         SOFTWAREI2C_PORT_ERROR(config, "SDA or SCL already low!");
     }
 
+    // Start sequence
     SOFTWAREI2C_PORT_SDA_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);
     SOFTWAREI2C_PORT_SCL_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);
 
+    // Send address bits
     for(int i = 0; i < 7; i++)
     {
         SoftI2C_SendBit(config, (address & 0x1) == 1);
         address = address >> 1;
     }
+    // Send read/!write bit
     SoftI2C_SendBit(config, reading);
 
+    // Check for nack
     bool nack = SoftI2C_RecvBit(config);
+    // Return true if nack has been received
     return !nack;
 }
 
 bool SoftI2C_Restart(SoftI2C_Port_Config_t config, uint8_t address, bool reading) {
+    // Reset bus to enable restart
     SOFTWAREI2C_PORT_SDA_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
     SOFTWAREI2C_PORT_SCL_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
 
+    // Re-send start sequence, address and read/!write bit
     return SoftI2C_Start(config, address, reading);
 }
 
 
 bool SoftI2C_SendByte(SoftI2C_Port_Config_t config, uint8_t data) {
+    // Send bits from data byte
     for(int i = 0; i < 8; i++)
     {
         SoftI2C_SendBit(config, (data & 0x1) == 1);
         address = data >> 1;
     }
 
+        // Check for nack
     bool nack = SoftI2C_RecvBit(config);
+    // Return true if nack has been received
     return !nack;
 }
 
 
 uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont) {
     uint8_t data = 0;
+    // Receive bits from data byte
     for(int i = 0; i < 8; i++)
     {
         if(SoftI2C_RecvBit(config)) {
@@ -118,6 +132,8 @@ uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont) {
         }
         data = data << 1;
     }
+
+    // Send ack bit if cont is true
     SoftI2C_SendBit(config, cont);
 
     return data;
@@ -125,8 +141,11 @@ uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont) {
 
 
 void SoftI2C_Stop(SoftI2C_Port_Config_t config) {
+    // Reset bus
     SOFTWAREI2C_PORT_SDA_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);
+
+    // Stop sequence
     SOFTWAREI2C_PORT_SCL_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
     SOFTWAREI2C_PORT_SDA_HIGH(config);

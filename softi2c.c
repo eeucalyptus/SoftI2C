@@ -17,7 +17,7 @@
 #include "softi2c.h"
 #include "softi2c_port.h"
 
-inline void SoftI2C_SendBit(SoftI2C_Port_Config_t config, bool bit) {
+void SoftI2C_SendBit(SoftI2C_Port_Config_t *config, bool bit) {
     if(bit) {
         // SDA high if bit is true
         SOFTWAREI2C_PORT_SDA_HIGH(config);
@@ -32,7 +32,7 @@ inline void SoftI2C_SendBit(SoftI2C_Port_Config_t config, bool bit) {
     SOFTWAREI2C_PORT_SCL_HIGH(config);
     do {
         // Delay
-        I2SOFTWAREI2C_PORT_DELAY(config);
+        SOFTWAREI2C_PORT_DELAY(config);
     }
     // TODO last delay may be needed (clock might have risen nanoseconds before check)
 
@@ -42,7 +42,7 @@ inline void SoftI2C_SendBit(SoftI2C_Port_Config_t config, bool bit) {
     SOFTWAREI2C_PORT_SCL_LOW(config);
 }
 
-inline bool SoftI2C_RecvBit(SoftI2C_Port_Config_t config) {
+bool SoftI2C_RecvBit(SoftI2C_Port_Config_t *config) {
     // SDA High
     SOFTWAREI2C_PORT_SDA_HIGH(config);
     // Delay
@@ -61,14 +61,14 @@ inline bool SoftI2C_RecvBit(SoftI2C_Port_Config_t config) {
     SOFTWAREI2C_PORT_SCL_LOW(config);
 }
 
-void SoftI2C_Init(SoftI2C_Port_Config_t config) {
+void SoftI2C_Init(SoftI2C_Port_Config_t *config) {
     // Initialize SDA pin
     SOFTWAREI2C_PORT_SDA_INIT(config);
     // Initialize SCL pin
     SOFTWAREI2C_PORT_SCL_INIT(config);
 }
 
-bool SoftI2C_Start(SoftI2C_Port_Config_t config, uint8_t address, bool reading) {
+bool SoftI2C_Start(SoftI2C_Port_Config_t *config, uint8_t address, bool reading) {
     // Check if already started or bus not ready
     if(!SOFTWAREI2C_PORT_SCL_GET(config) || !SOFTWAREI2C_PORT_SCL_GET(config)) {
         SOFTWAREI2C_PORT_ERROR(config, "SDA or SCL already low!");
@@ -95,7 +95,7 @@ bool SoftI2C_Start(SoftI2C_Port_Config_t config, uint8_t address, bool reading) 
     return !nack;
 }
 
-bool SoftI2C_Restart(SoftI2C_Port_Config_t config, uint8_t address, bool reading) {
+bool SoftI2C_Restart(SoftI2C_Port_Config_t *config, uint8_t address, bool reading) {
     // Reset bus to enable restart
     SOFTWAREI2C_PORT_SDA_HIGH(config);
     SOFTWAREI2C_PORT_DELAY(config);
@@ -107,12 +107,12 @@ bool SoftI2C_Restart(SoftI2C_Port_Config_t config, uint8_t address, bool reading
 }
 
 
-bool SoftI2C_SendByte(SoftI2C_Port_Config_t config, uint8_t data) {
+bool SoftI2C_SendByte(SoftI2C_Port_Config_t *config, uint8_t data) {
     // Send bits from data byte
     for(int i = 0; i < 8; i++)
     {
         SoftI2C_SendBit(config, (data & 0x1) == 1);
-        address = data >> 1;
+        data = data >> 1;
     }
 
         // Check for nack
@@ -122,7 +122,7 @@ bool SoftI2C_SendByte(SoftI2C_Port_Config_t config, uint8_t data) {
 }
 
 
-uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont) {
+uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t *config, bool cont) {
     uint8_t data = 0;
     // Receive bits from data byte
     for(int i = 0; i < 8; i++)
@@ -140,7 +140,7 @@ uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont) {
 }
 
 
-void SoftI2C_Stop(SoftI2C_Port_Config_t config) {
+void SoftI2C_Stop(SoftI2C_Port_Config_t *config) {
     // Reset bus
     SOFTWAREI2C_PORT_SDA_LOW(config);
     SOFTWAREI2C_PORT_DELAY(config);

@@ -24,32 +24,32 @@
 /**
 * Initialize a software I2C bus using the given configuration
 */
-void SoftI2C_Init(SoftI2C_Port_Config_t config);
+void SoftI2C_Init(SoftI2C_Port_Config_t *config);
 
 /**
 * Start a data transfer using a given software I2C configuration
 */
-bool SoftI2C_Start(SoftI2C_Port_Config_t config, uint8_t address, bool reading);
+bool SoftI2C_Start(SoftI2C_Port_Config_t *config, uint8_t address, bool reading);
 
 /**
 * Restart a data transfer using a given software I2C configuration
 */
-bool SoftI2C_Restart(SoftI2C_Port_Config_t config, uint8_t address, bool reading);
+bool SoftI2C_Restart(SoftI2C_Port_Config_t *config, uint8_t address, bool reading);
 
 /**
 * Send a byte using a given software I2C configuration
 */
-bool SoftI2C_SendByte(SoftI2C_Port_Config_t config, uint8_t data);
+bool SoftI2C_SendByte(SoftI2C_Port_Config_t *config, uint8_t data);
 
 /**
 * Receive a byte using a given software I2C configuration
 */
-uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t config, bool cont);
+uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t *config, bool cont);
 
 /**
 * Stop a data transfer using a given software I2C configuration
 */
-void SoftI2C_Stop(SoftI2C_Port_Config_t config);
+void SoftI2C_Stop(SoftI2C_Port_Config_t *config);
 
 
 #endif // SOFTI2C_H_

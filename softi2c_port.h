@@ -17,18 +17,53 @@
 #ifndef SOFTI2C_PORT_H_
 #define SOFTI2C_PORT_H_
 
+#include "MK22F51212.h"
+
 typedef struct {
-    // TODO Implement
+	PORT_Type *sda_port;
+	int sda_pin;
+	PORT_Type *scl_port;
+	int scl_pin;
 } SoftI2C_Port_Config_t;
 
-#define SOFTWAREI2C_PORT_SDA_INIT(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SCL_INIT(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SDA_HIGH(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SCL_HIGH(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SDA_LOW(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SCL_LOW(config) {(void)config;} // TODO Implement
-#define SOFTWAREI2C_PORT_SDA_GET(config) (0) // TODO Implement
-#define SOFTWAREI2C_PORT_SCL_GET(config) (0) // TODO Implement
+
+/*
+ * PORTBASE = 0x40049000u
+ * PORTOFFSET = 0x1000
+ *
+ * GPIOBASE = 0x400FF000u
+ * GPIOOFFSET = 0x40
+ *
+ * portpos = port - PORTBASE
+ * portidx = portpos / PORTOFFSET
+ * gpioidx = portidx
+ * gpiopos = gpioidx * GPIOOFFSET
+ * gpio = gpiopos + GPIOBASE
+ *
+ * => gpio = ((port - PORTBASE) / PORTOFFSET) * GPIOOFFSET + GPIOBASE
+ */
+#define SOFTWAREI2C_PORT_PORT_INDEX(port) (((uint32_t)port - PORTA_BASE) / (PORTB_BASE - PORTA_BASE))
+#define SOFTWAREI2C_PORT_GPIO_REG(port) ((GPIO_Type *)((SOFTWAREI2C_PORT_PORT_INDEX(port) * (GPIOB_BASE - GPIOA_BASE) + GPIOA_BASE)))
+#define SOFTWAREI2C_PORT_SCGC5_MASK(port) *((uint32_t *)(0x200U << SOFTWAREI2C_PORT_PORT_INDEX(port)))
+
+#define SOFTWAREI2C_PORT_SDA_INIT(config) { \
+	SIM->SCGC5 |= SOFTWAREI2C_PORT_SCGC5_MASK(config->sda_port); \
+	config->sda_port->PCR[config->sda_pin] = PORT_PCR_MUX(1) | PORT_PCR_ODE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK; \
+	SOFTWAREI2C_PORT_GPIO_REG(config->sda_port)->PDDR |= (1 << config->sda_pin); \
+}
+
+#define SOFTWAREI2C_PORT_SCL_INIT(config) { \
+	SIM->SCGC5 |= SOFTWAREI2C_PORT_SCGC5_MASK(config->scl_port); \
+	config->scl_port->PCR[config->scl_pin] = PORT_PCR_MUX(1) | PORT_PCR_ODE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK; \
+	SOFTWAREI2C_PORT_GPIO_REG(config->scl_port)->PDDR |= (1 << config->scl_pin); \
+}
+
+#define SOFTWAREI2C_PORT_SDA_HIGH(config) {SOFTWAREI2C_PORT_GPIO_REG(config->sda_port)->PSOR = 1 << config->sda_pin;}
+#define SOFTWAREI2C_PORT_SCL_HIGH(config) {SOFTWAREI2C_PORT_GPIO_REG(config->scl_port)->PSOR = 1 << config->scl_pin;}
+#define SOFTWAREI2C_PORT_SDA_LOW(config) {SOFTWAREI2C_PORT_GPIO_REG(config->sda_port)->PCOR = 1 << config->sda_pin;}
+#define SOFTWAREI2C_PORT_SCL_LOW(config) {SOFTWAREI2C_PORT_GPIO_REG(config->scl_port)->PCOR = 1 << config->scl_pin;}
+#define SOFTWAREI2C_PORT_SDA_GET(config) ((SOFTWAREI2C_PORT_GPIO_REG(config->sda_port)->PDIR & (1 << config->sda_pin)) != 0)
+#define SOFTWAREI2C_PORT_SCL_GET(config) ((SOFTWAREI2C_PORT_GPIO_REG(config->scl_port)->PDIR & (1 << config->scl_pin)) != 0)
 
 #define SOFTWAREI2C_PORT_DELAY(config) \
 {\

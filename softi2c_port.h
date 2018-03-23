@@ -49,12 +49,14 @@ typedef struct {
 #define SOFTWAREI2C_PORT_SDA_INIT(config) { \
 	SIM->SCGC5 |= SOFTWAREI2C_PORT_SCGC5_MASK(config->sda_port); \
 	config->sda_port->PCR[config->sda_pin] = PORT_PCR_MUX(1) | PORT_PCR_ODE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK; \
+	SOFTWAREI2C_PORT_GPIO_REG(config->sda_port)->PSOR = (1 << config->sda_pin); \
 	SOFTWAREI2C_PORT_GPIO_REG(config->sda_port)->PDDR |= (1 << config->sda_pin); \
 }
 
 #define SOFTWAREI2C_PORT_SCL_INIT(config) { \
 	SIM->SCGC5 |= SOFTWAREI2C_PORT_SCGC5_MASK(config->scl_port); \
 	config->scl_port->PCR[config->scl_pin] = PORT_PCR_MUX(1) | PORT_PCR_ODE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK; \
+	SOFTWAREI2C_PORT_GPIO_REG(config->scl_port)->PSOR = (1 << config->scl_pin); \
 	SOFTWAREI2C_PORT_GPIO_REG(config->scl_port)->PDDR |= (1 << config->scl_pin); \
 }
 
@@ -69,7 +71,7 @@ typedef struct {
 {\
     volatile int SoftI2C_Port_DelayCount; \
     for(SoftI2C_Port_DelayCount = 0; \
-        SoftI2C_Port_DelayCount < 10; \
+        SoftI2C_Port_DelayCount < 100; \
         SoftI2C_Port_DelayCount++) \
     { \
         (void)SoftI2C_Port_DelayCount; \

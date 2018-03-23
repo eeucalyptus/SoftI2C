@@ -57,8 +57,12 @@ bool SoftI2C_RecvBit(SoftI2C_Port_Config_t *config) {
     while(!SOFTWAREI2C_PORT_SCL_GET(config));
     // TODO last delay may be needed (clock might have risen nanoseconds before check)
 
+    bool bit = SOFTWAREI2C_PORT_SDA_GET(config);
+
     // Clock low
     SOFTWAREI2C_PORT_SCL_LOW(config);
+
+    return bit;
 }
 
 void SoftI2C_Init(SoftI2C_Port_Config_t *config) {
@@ -83,14 +87,16 @@ bool SoftI2C_Start(SoftI2C_Port_Config_t *config, uint8_t address, bool reading)
     // Send address bits
     for(int i = 0; i < 7; i++)
     {
-        SoftI2C_SendBit(config, (address & 0x1) == 1);
-        address = address >> 1;
+        SoftI2C_SendBit(config, (address & 0x40) == 0x40);
+        address = address << 1;
     }
     // Send read/!write bit
     SoftI2C_SendBit(config, reading);
 
     // Check for nack
     bool nack = SoftI2C_RecvBit(config);
+    SOFTWAREI2C_PORT_DELAY(config);
+    SOFTWAREI2C_PORT_DELAY(config);
     // Return true if nack has been received
     return !nack;
 }
@@ -111,12 +117,14 @@ bool SoftI2C_SendByte(SoftI2C_Port_Config_t *config, uint8_t data) {
     // Send bits from data byte
     for(int i = 0; i < 8; i++)
     {
-        SoftI2C_SendBit(config, (data & 0x1) == 1);
-        data = data >> 1;
+        SoftI2C_SendBit(config, (data & 0x80) == 0x80);
+        data = data << 1;
     }
 
         // Check for nack
     bool nack = SoftI2C_RecvBit(config);
+    SOFTWAREI2C_PORT_DELAY(config);
+    SOFTWAREI2C_PORT_DELAY(config);
     // Return true if nack has been received
     return !nack;
 }
@@ -127,14 +135,14 @@ uint8_t SoftI2C_RecvByte(SoftI2C_Port_Config_t *config, bool cont) {
     // Receive bits from data byte
     for(int i = 0; i < 8; i++)
     {
+        data = data << 1;
         if(SoftI2C_RecvBit(config)) {
             data |= 1;
         }
-        data = data << 1;
     }
 
     // Send ack bit if cont is true
-    SoftI2C_SendBit(config, cont);
+    SoftI2C_SendBit(config, !cont);
 
     return data;
 }

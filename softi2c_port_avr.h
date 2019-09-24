@@ -27,7 +27,7 @@
 * WITH address-of operator
 */
 typedef struct {
-    uint8_t *port;
+    volatile uint8_t *port;
 	uint8_t sda_pin;
 	uint8_t scl_pin;
 } SoftI2C_Port_Config_t;

@@ -15,7 +15,9 @@
 */
 
 #include "softi2c.h"
-#include "softi2c_port.h"
+
+#include "stdbool.h"
+#include "stdint.h"
 
 void SoftI2C_SendBit(SoftI2C_Port_Config_t *config, bool bit) {
     if(bit) {
@@ -26,16 +28,12 @@ void SoftI2C_SendBit(SoftI2C_Port_Config_t *config, bool bit) {
         // SDA low if bit is false
         SOFTWAREI2C_PORT_SDA_LOW(config);
     }
-    // Delay
-    SOFTWAREI2C_PORT_DELAY(config);
     // Clock high
     SOFTWAREI2C_PORT_SCL_HIGH(config);
     do {
         // Delay
         SOFTWAREI2C_PORT_DELAY(config);
     }
-    // TODO last delay may be needed (clock might have risen nanoseconds before check)
-
     // Until clock is actually high (clock stretching)
     while(!SOFTWAREI2C_PORT_SCL_GET(config));
     // Clock low

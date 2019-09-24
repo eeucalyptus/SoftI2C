@@ -17,9 +17,14 @@
 #ifndef SOFTI2C_H_
 #define SOFTI2C_H_
 
-#include "softi2c_port.h"
+#ifdef __AVR__
+#include "softi2c_port_avr.h"
+#else
+#error no port for given architecture
+#endif
 
 #include "stdbool.h"
+#include "stdint.h"
 
 /**
 * Initialize a software I2C bus using the given configuration

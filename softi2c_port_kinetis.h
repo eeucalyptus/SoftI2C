@@ -19,13 +19,17 @@
 
 #include "MK22F51212.h"
 
+/**
+* Has to be used as
+* config.sda_port = &PORTB;
+* WITH address-of operator
+*/
 typedef struct {
 	PORT_Type *sda_port;
 	int sda_pin;
 	PORT_Type *scl_port;
 	int scl_pin;
 } SoftI2C_Port_Config_t;
-
 
 /*
  * PORTBASE = 0x40049000u

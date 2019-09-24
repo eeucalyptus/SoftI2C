@@ -21,6 +21,11 @@
 
 
 
+/**
+* Has to be used as
+* config.sda_port = &PORTB;
+* WITH address-of operator
+*/
 typedef struct {
     uint8_t *port;
 	uint8_t sda_pin;

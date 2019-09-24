@@ -19,11 +19,7 @@
 
 #include "MK22F51212.h"
 
-/**
-* Has to be used as
-* config.sda_port = &PORTB;
-* WITH address-of operator
-*/
+
 typedef struct {
 	PORT_Type *sda_port;
 	int sda_pin;
